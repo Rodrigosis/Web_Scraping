@@ -52,7 +52,7 @@ class BrMangas(Scraping):
         return manga
 
     def get_html(self, url: str) -> BeautifulSoup:
-        if 'https://www.brmangas.com' in url:
+        if 'www.brmangas.com' in url:
             pass
         else:
             raise Exception("This scraping script wasn't made for this page")
