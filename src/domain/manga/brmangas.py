@@ -5,12 +5,15 @@ from fake_useragent import UserAgent
 from bs4 import BeautifulSoup
 
 from src.domain.scraping import Scraping, Manga
+from src.infra.database import Database
+from src.infra.storage import Storage
 
 
 class BrMangas(Scraping):
 
-    def __init__(self, database):
-        self.db = database
+    def __init__(self):
+        self.db = Database()
+        self.s3 = Storage()
 
     def add_new(self, url: str) -> Manga:
         manga = Manga(manga_id=str(uuid.uuid4()))
@@ -41,11 +44,14 @@ class BrMangas(Scraping):
                 manga.author = author.strip()
             elif 'Categorias:' in line:
                 categories = line.replace('Categorias:', '')
-                tags = [x.strip() for x in categories.split(',')]
-                manga.tags = tags
+                manga.categories = [x.strip() for x in categories.split(',')]
 
         manga = self.chapters_info(manga=manga, html=soup)
         manga = self.get_image(manga=manga, html=soup)
+
+        self.db.set_manga(manga=manga)
+        self.s3.set_file(image_name=manga.id, image_folder=manga.image)
+
         return manga
 
     def update(self, manga_id: str, url: str) -> Manga:
@@ -89,9 +95,10 @@ class BrMangas(Scraping):
         f.write(response.content)
         f.close()
 
+        manga.image = path + manga.id + '.jpg'
         return manga
 
 
 # if __name__ == '__main__':
-#     manga = BrMangas('').add_new('https://www.brmangas.com/mangas/kaguya-sama-love-is-war-online/')
+#     manga = BrMangas().add_new('https://www.brmangas.com/mangas/kaguya-sama-love-is-war-online/')
 #     print(manga)
