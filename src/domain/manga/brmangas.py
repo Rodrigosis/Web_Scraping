@@ -1,5 +1,6 @@
 import requests
 import uuid
+import pathlib
 from fake_useragent import UserAgent
 from bs4 import BeautifulSoup
 
@@ -44,6 +45,7 @@ class BrMangas(Scraping):
                 manga.tags = tags
 
         manga = self.chapters_info(manga=manga, html=soup)
+        manga = self.get_image(manga=manga, html=soup)
         return manga
 
     def update(self, manga_id: str, url: str) -> Manga:
@@ -60,11 +62,9 @@ class BrMangas(Scraping):
         page = requests.get(url, headers={'User-Agent': str(UserAgent().chrome)})
 
         if page.status_code == 200:
-            pass
+            return BeautifulSoup(page.text, features='html.parser')
         else:
             raise Exception(f'Request status_code {page.status_code}')
-
-        return BeautifulSoup(page.text, features='html.parser')
 
     def chapters_info(self, manga: Manga, html) -> Manga:
         chapters = html.find('ul', {'class': 'capitulos'})
@@ -76,6 +76,22 @@ class BrMangas(Scraping):
         manga.last_cap = float(last_cap)
         return manga
 
+    def get_image(self, manga: Manga, html) -> Manga:
+        img_block = html.find('div', {'class': 'serie-capa'})
+        img_url = img_block.img['src']
 
-if __name__ == '__main__':
-    BrMangas('').add_new('https://www.brmangas.com/mangas/nande-koko-ni-sensei-ga-online/')
+        response = requests.get(img_url)
+
+        path = pathlib.Path(__file__).parent.parent.parent.resolve()
+        path = str(path) + '/infra/images/'
+
+        f = open(path + manga.id + '.jpg', 'wb')
+        f.write(response.content)
+        f.close()
+
+        return manga
+
+
+# if __name__ == '__main__':
+#     manga = BrMangas('').add_new('https://www.brmangas.com/mangas/kaguya-sama-love-is-war-online/')
+#     print(manga)

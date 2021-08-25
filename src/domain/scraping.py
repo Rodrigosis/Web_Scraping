@@ -3,6 +3,7 @@ from abc import ABC
 from typing import Optional, List
 from bs4 import BeautifulSoup
 
+
 class Manga:
 
     def __init__(self, manga_id: str, name: Optional[str] = None, about: Optional[str] = None,
