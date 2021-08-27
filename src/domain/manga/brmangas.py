@@ -49,8 +49,8 @@ class BrMangas(Scraping):
         manga = self.chapters_info(manga=manga, html=soup)
         manga = self.get_image(manga=manga, html=soup)
 
-        self.db.set_manga(manga=manga)
-        self.s3.set_file(image_name=manga.image)
+        # self.db.set_manga(manga=manga)
+        # self.s3.set_file(image_name=manga.image)
 
         return manga
 
