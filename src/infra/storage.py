@@ -1,4 +1,5 @@
 import os
+import pathlib
 from dotenv import load_dotenv
 import boto3
 
@@ -15,10 +16,11 @@ class Storage:
 
     def __init__(self):
         self.s3 = boto3.resource('s3')
+        self.image_path = str(pathlib.Path(__file__).parent.resolve()) + '/images/'
 
-    def set_file(self, image_name: str, image_folder: str):
-        s3_object = self.s3.Object(s3_bucket, s3_folder + f'mangas/covers/{image_name}.jpg')
-        s3_object.put(Body=image_folder)
+    def set_file(self, image_name: str):
+        s3_object = self.s3.Object(s3_bucket, s3_folder + f'mangas/covers/{image_name}')
+        s3_object.put(Body=self.image_path + image_name)
 
     def get_file(self):
         pass

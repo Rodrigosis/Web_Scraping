@@ -50,7 +50,7 @@ class BrMangas(Scraping):
         manga = self.get_image(manga=manga, html=soup)
 
         self.db.set_manga(manga=manga)
-        self.s3.set_file(image_name=manga.id, image_folder=manga.image)
+        self.s3.set_file(image_name=manga.image)
 
         return manga
 
@@ -95,7 +95,7 @@ class BrMangas(Scraping):
         f.write(response.content)
         f.close()
 
-        manga.image = path + manga.id + '.jpg'
+        manga.image = manga.id + '.jpg'
         return manga
 
 
