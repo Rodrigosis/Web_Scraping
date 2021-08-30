@@ -11,6 +11,17 @@ router = APIRouter()
 # delete -> delete mangas
 
 
+@router.get("/manga", response_model=ObjResponse)
+async def manga():
+
+    log_info = f'foobar log'
+    logger.info(log_info)
+
+    # BrMangas().add_new()
+
+    return ObjResponse(data={'foo': 'bar'})
+
+
 @router.post("/manga", response_model=ObjResponse)
 async def manga(data: ObjRequest = Depends()):
 
@@ -19,7 +30,7 @@ async def manga(data: ObjRequest = Depends()):
 
     # BrMangas().add_new()
 
-    return ObjRequest()
+    return ObjResponse(data={'foobar': data.name})
 
 
 @router.post("/doujinshi", response_model=ObjResponse)

@@ -1,0 +1,7 @@
+curl -X 'GET' 'http://0.0.0.0:8000/scraping/manga' -H 'accept: application/json'
+
+--------- POST without Depends() ---------
+curl -X 'POST' 'http://0.0.0.0:8000/scraping/manga' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"name": "Hello"}'
+
+--------- POST with Depends() ---------
+curl -X 'POST' 'http://0.0.0.0:8000/scraping/manga?name=hello' -H 'accept: application/json' -d ''
