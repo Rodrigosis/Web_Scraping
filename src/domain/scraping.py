@@ -1,6 +1,6 @@
 import abc
 from abc import ABC
-from typing import Optional, List
+from typing import Optional, List, Dict
 from bs4 import BeautifulSoup
 
 
@@ -44,6 +44,23 @@ class Manga:
                f'Author: {self.author}\n' \
                f'Alternative names: {self.alternative_names}\n' \
                f'About: {self.about}'
+
+    def to_json(self) -> Dict:
+        return {
+            'id': self.id,
+            'name': self.name,
+            'about': self.about,
+            'categories': self.categories,
+            'last_cap': self.last_cap,
+            'last_cap_read': self.last_cap_read,
+            'num_cap': self.num_cap,
+            'alternative_names': self.alternative_names,
+            'score': self.score,
+            'status': self.status,
+            'author': self.author,
+            'image': self.image,
+            'link': self.link
+        }
 
 
 class Scraping(ABC):

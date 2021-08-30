@@ -1,11 +1,12 @@
 import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from typing import List, Optional
 
 from src.domain.scraping import Manga
 
 load_dotenv()
-db_uri = os.getenv('MONGO_DB_URI')
+db_uri = os.getenv('DB_URI')
 
 
 class Database:
@@ -28,21 +29,31 @@ class Database:
                 'image': manga.image,
                 'link': manga.link}
 
-        self.db.main.mangas.insert_one(data)
+        self.db.manga.mangas.insert_one(data)
 
-    def get_manga(self, manga_id: str) -> Manga:
-        data = list(self.db.main.mangas.find({'id': manga_id}))[0]
+    def get_manga(self, manga_ids: Optional[List[str]] = None) -> List[Manga]:
+        if manga_ids is None:
+            data = list(self.db.manga.mangas.find({}))
+        else:
+            data = []
+            for i in manga_ids:
+                results = list(self.db.manga.mangas.find({'id': i}))
+                data.extend(results)
 
-        return Manga(manga_id=data['id'],
-                     name=data['name'],
-                     author=data['author'],
-                     categories=list(data['categories']),
-                     last_cap=float(data['last_cap']),
-                     last_cap_read=float(data['last_cap_read']),
-                     num_cap=int(data['num_cap']),
-                     alternative_names=list(data['alternative_names']),
-                     score=float(data['score']),
-                     status=data['status'],
-                     about=data['about'],
-                     image=data['image'],
-                     link=data['link'])
+        mangas = [
+            Manga(manga_id=manga['id'],
+                  name=manga['name'],
+                  author=manga['author'],
+                  categories=list(manga['categories']),
+                  last_cap=float(manga['last_cap']),
+                  last_cap_read=float(manga['last_cap_read']),
+                  num_cap=int(manga['num_cap']),
+                  alternative_names=list(manga['alternative_names']),
+                  score=float(manga['score']),
+                  status=manga['status'],
+                  about=manga['about'],
+                  image=manga['image'],
+                  link=manga['link'])
+            for manga in data]
+
+        return mangas

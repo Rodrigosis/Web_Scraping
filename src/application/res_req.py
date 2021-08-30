@@ -9,3 +9,11 @@ class ObjRequest(BaseModel):
 
 class ObjResponse(BaseModel):
     data: Dict
+
+
+class MangaPutRequest(BaseModel):
+    links: List[str]
+
+
+class MangaPutResponse(BaseModel):
+    data: List[Dict]

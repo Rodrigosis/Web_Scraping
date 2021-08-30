@@ -21,6 +21,7 @@ class Storage:
     def set_file(self, image_name: str):
         s3_object = self.s3.Object(s3_bucket, s3_folder + f'mangas/covers/{image_name}')
         s3_object.put(Body=self.image_path + image_name)
+        os.remove(self.image_path + image_name)
 
     def get_file(self):
         pass

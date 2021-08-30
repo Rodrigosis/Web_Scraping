@@ -1,22 +1,23 @@
 import requests
 import uuid
 import pathlib
-from fake_useragent import UserAgent
 from bs4 import BeautifulSoup
+# from fake_useragent import UserAgent
 
 from src.domain.scraping import Scraping, Manga
 from src.infra.database import Database
 from src.infra.storage import Storage
 
 
-class BrMangas(Scraping):
+class UrlOne(Scraping):
 
     def __init__(self):
         self.db = Database()
         self.s3 = Storage()
+        # self.ua = UserAgent(cache=False)
 
     def add_new(self, url: str) -> Manga:
-        manga = Manga(manga_id=str(uuid.uuid4()))
+        manga = Manga(manga_id=str(uuid.uuid4()), link=url)
         soup = self.get_html(url=url)
         # print(soup.prettify())
 
@@ -49,8 +50,8 @@ class BrMangas(Scraping):
         manga = self.chapters_info(manga=manga, html=soup)
         manga = self.get_image(manga=manga, html=soup)
 
-        # self.db.set_manga(manga=manga)
-        # self.s3.set_file(image_name=manga.image)
+        self.db.set_manga(manga=manga)
+        self.s3.set_file(image_name=manga.image)
 
         return manga
 
@@ -60,12 +61,8 @@ class BrMangas(Scraping):
         return manga
 
     def get_html(self, url: str) -> BeautifulSoup:
-        if 'www.brmangas.com' in url:
-            pass
-        else:
-            raise Exception("This scraping script wasn't made for this page")
-
-        page = requests.get(url, headers={'User-Agent': str(UserAgent().chrome)})
+        page = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; '
+                                                        'Trident/4.0; InfoPath.2; SV1; .NET CLR 2.0.50727; WOW64)'})
 
         if page.status_code == 200:
             return BeautifulSoup(page.text, features='html.parser')
@@ -97,8 +94,3 @@ class BrMangas(Scraping):
 
         manga.image = manga.id + '.jpg'
         return manga
-
-
-# if __name__ == '__main__':
-#     manga = BrMangas().add_new('https://www.brmangas.com/mangas/kaguya-sama-love-is-war-online/')
-#     print(manga)
