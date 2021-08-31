@@ -38,3 +38,7 @@ class Storage:
         s3_object = s3.Object(s3_bucket, folder + image_name)
         with open(self.image_path + image_name, "rb") as img:
             s3_object.put(Body=img)
+
+
+if __name__ == '__main__':
+    Storage().get_file()

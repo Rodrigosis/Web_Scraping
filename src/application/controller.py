@@ -1,23 +1,34 @@
 from fastapi import APIRouter
 from typing import List, Dict
 
-from src.logging_config import logger
+# from src.logging_config import logger
 from src.application.validation.validation import Pages, validate
 from src.domain.manga.url_one import UrlOne
+from src.infra.database import Database
 
 router = APIRouter()
 
 
 @router.get("/manga")
-async def get_all_mangas() -> Dict:
+async def get_all_mangas() -> List[Dict]:
+    data = Database().get_manga()
 
-    return {'foo': 'bar'}
+    mangas = []
+    for i in data:
+        mangas.append(i.to_json())
+
+    return mangas
 
 
 @router.post("/manga")
-async def get_mangas(data: List[str]) -> Dict:
+async def get_mangas(ids: List[str]) -> List[Dict]:
+    data = Database().get_manga(ids)
 
-    return {'foobar': 'foo'}
+    mangas = []
+    for i in data:
+        mangas.append(i.to_json())
+
+    return mangas
 
 
 @router.post("/manga/add")
