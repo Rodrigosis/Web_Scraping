@@ -57,3 +57,24 @@ class Database:
             for manga in data]
 
         return mangas
+
+    def get_manga_by_name(self, name: str) -> List[Manga]:
+        data = list(self.db.manga.mangas.find({'name': name}))
+
+        mangas = [
+            Manga(manga_id=manga['id'],
+                  name=manga['name'],
+                  author=manga['author'],
+                  categories=list(manga['categories']),
+                  last_cap=float(manga['last_cap']),
+                  last_cap_read=float(manga['last_cap_read']),
+                  num_cap=int(manga['num_cap']),
+                  alternative_names=list(manga['alternative_names']),
+                  score=float(manga['score']),
+                  status=manga['status'],
+                  about=manga['about'],
+                  image=manga['image'],
+                  link=manga['link'])
+            for manga in data]
+
+        return mangas

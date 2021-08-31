@@ -35,15 +35,19 @@ class Manga:
         self.link = link
 
     def __str__(self):
-        return f'Name: {self.name}\n' \
+        return f'Id: {self.id}\n' \
+               f'Name: {self.name}\n' \
                f'Categories: {self.categories}\n' \
                f'Last cap: {self.last_cap}\n' \
                f'Num caps: {self.num_cap}\n' \
+               f'Last cap read: {self.last_cap_read}\n' \
                f'Score: {self.score}\n' \
                f'Status: {self.status}\n' \
                f'Author: {self.author}\n' \
                f'Alternative names: {self.alternative_names}\n' \
-               f'About: {self.about}'
+               f'About: {self.about}' \
+               f'Image: {self.image}\n' \
+               f'Link: {self.link}'
 
     def to_json(self) -> Dict:
         return {

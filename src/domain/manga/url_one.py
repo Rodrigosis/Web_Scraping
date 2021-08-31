@@ -2,7 +2,7 @@ import requests
 import uuid
 import pathlib
 from bs4 import BeautifulSoup
-# from fake_useragent import UserAgent
+import urllib3
 
 from src.domain.scraping import Scraping, Manga
 from src.infra.database import Database
@@ -14,7 +14,7 @@ class UrlOne(Scraping):
     def __init__(self):
         self.db = Database()
         self.s3 = Storage()
-        # self.ua = UserAgent(cache=False)
+        self.http = urllib3.PoolManager()
 
     def add_new(self, url: str) -> Manga:
         manga = Manga(manga_id=str(uuid.uuid4()), link=url)
@@ -25,6 +25,10 @@ class UrlOne(Scraping):
         name = name.replace('Ler', '')
         name = name.replace('Online', '')
         manga.name = name.strip()
+
+        check_manga_exist = self.db.get_manga_by_name(manga.name)
+        if check_manga_exist:
+            return check_manga_exist[0]
 
         text_block = soup.find('div', {'class': 'serie-texto'})
         text_block = text_block.p.p.text
@@ -51,7 +55,7 @@ class UrlOne(Scraping):
         manga = self.get_image(manga=manga, html=soup)
 
         self.db.set_manga(manga=manga)
-        self.s3.set_file(image_name=manga.image)
+        # self.s3.set_file(image_name=manga.image, folder='/mangas/front/')
 
         return manga
 
@@ -61,13 +65,12 @@ class UrlOne(Scraping):
         return manga
 
     def get_html(self, url: str) -> BeautifulSoup:
-        page = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; '
-                                                        'Trident/4.0; InfoPath.2; SV1; .NET CLR 2.0.50727; WOW64)'})
+        page = self.http.request('GET', url)
 
-        if page.status_code == 200:
-            return BeautifulSoup(page.text, features='html.parser')
+        if page.status == 200:
+            return BeautifulSoup(page.data, features='html.parser')
         else:
-            raise Exception(f'Request status_code {page.status_code}')
+            raise Exception(f'Request status_code {page.status}')
 
     def chapters_info(self, manga: Manga, html) -> Manga:
         chapters = html.find('ul', {'class': 'capitulos'})

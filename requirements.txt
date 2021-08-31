@@ -6,4 +6,4 @@ boto3==1.17.57
 fastapi~=0.68.1
 pydantic~=1.8.2
 uvicorn~=0.15.0
-fake-useragent~=0.1.11
+urllib3~=1.26.6

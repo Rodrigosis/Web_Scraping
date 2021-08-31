@@ -1,40 +1,31 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
+from typing import List, Dict
 
 from src.logging_config import logger
 from src.application.validation.validation import Pages, validate
-from src.application.res_req import ObjRequest, ObjResponse, MangaPutRequest, MangaPutResponse
 from src.domain.manga.url_one import UrlOne
 
 router = APIRouter()
-# get -> get all mangas
-# post -> get specifics mangas
-# put -> put mangas
-# delete -> delete mangas
 
 
-@router.get("/manga", response_model=ObjResponse)
-async def manga():
+@router.get("/manga")
+async def get_all_mangas() -> Dict:
 
-    log_info = f'foobar log'
-    logger.info(log_info)
-
-    return ObjResponse(data={'foo': 'bar'})
+    return {'foo': 'bar'}
 
 
-@router.post("/manga", response_model=ObjResponse)
-async def manga(data: ObjRequest = Depends()):
+@router.post("/manga")
+async def get_mangas(data: List[str]) -> Dict:
 
-    log_info = f'foobar log {data.name}'
-    logger.info(log_info)
-
-    return ObjResponse(data={'foobar': data.name})
+    return {'foobar': 'foo'}
 
 
-@router.put("/manga", response_model=MangaPutResponse)
-async def manga(data: MangaPutRequest = Depends()):
+@router.post("/manga/add")
+async def add_mangas(data: List[str]) -> List[Dict]:
+
     mangas = []
 
-    for link in data.links:
+    for link in data:
         v = validate(link)
         if v == Pages.URL_ONE:
             new_manga = UrlOne().add_new(link)
@@ -42,43 +33,28 @@ async def manga(data: MangaPutRequest = Depends()):
         else:
             raise Exception("Not found scraping script for this page.")
 
-    log_info = f'foobar log'
-    logger.info(log_info)
-
-    return MangaPutResponse(data=mangas)
+    return mangas
 
 
-@router.delete("/manga", response_model=ObjResponse)
-async def manga(data: ObjRequest = Depends()):
+@router.post("/manga/remove")
+async def remove_mangas(data: List[str]) -> Dict:
 
-    log_info = f'foobar log {data.name}'
-    logger.info(log_info)
-
-    return ObjResponse(data={'foobar': data.name})
+    return {'foobar': 'foo'}
 
 
-@router.post("/doujinshi", response_model=ObjResponse)
-async def doujinshi(data: ObjRequest = Depends()):
+@router.post("/doujinshi")
+async def doujinshi(data: List[str]) -> Dict:
 
-    log_info = f'foobar log {data.name}'
-    logger.info(log_info)
-
-    return ObjRequest()
+    return {}
 
 
-@router.post("/anime", response_model=ObjResponse)
-async def anime(data: ObjRequest = Depends()):
+@router.post("/anime")
+async def anime(data: List[str]) -> Dict:
 
-    log_info = f'foobar log {data.name}'
-    logger.info(log_info)
-
-    return ObjRequest()
+    return {}
 
 
-@router.post("/movie", response_model=ObjResponse)
-async def movie(data: ObjRequest = Depends()):
+@router.post("/movie")
+async def movie(data: List[str]) -> Dict:
 
-    log_info = f'foobar log {data.name}'
-    logger.info(log_info)
-
-    return ObjRequest()
+    return {}
